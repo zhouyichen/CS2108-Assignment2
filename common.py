@@ -37,3 +37,7 @@ test_rms_energy_path = test_acoustic_folder + rms_energy_file_name
 filenames_file_name = 'filenames.csv'
 train_filenames_path = train_acoustic_folder + filenames_file_name
 test_filenames_path = test_acoustic_folder + filenames_file_name
+
+textual_folder = data_folder + 'textual/'
+textual_train_file_name = textual_folder + 'vine_desc_training_'
+textual_test_file_name = textual_folder + 'vine_desc_validation_'
