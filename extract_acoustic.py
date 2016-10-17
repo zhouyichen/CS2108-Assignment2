@@ -66,4 +66,4 @@ def extract_for_folder(input_audio_folder, output_folder):
 
 if __name__ == '__main__':
 	extract_for_folder(train_audio_folder, train_acoustic_folder)
-	# extract_for_folder(test_audio_folder, test_acoustic_folder)
+	extract_for_folder(test_audio_folder, test_acoustic_folder)
