@@ -9,9 +9,15 @@ import glob
 from common import *
 import csv
 
+def extend_to_length_k(y, k):
+	r = k / y.size + 1
+	res = np.tile(y, r)
+	return res[:k]
+
 def getAcousticFeatures(audio_reading_path):
     # 1. Load the audio clip;
     y, sr = librosa.load(audio_reading_path)
+    y = extend_to_length_k(y, AUDIO_LENGTH)
 
     # 2. Separate harmonics and percussives into two waveforms.
     # y_harmonic, y_percussive = librosa.effects.hpss(y)

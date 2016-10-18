@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 
+AUDIO_LENGTH = 308700
+NUMBER_OF_FRAME = 603
+
 data_folder = 'data/'
 video_folder = data_folder + 'video/'
 train_video_folder = video_folder + 'training/'
