@@ -7,6 +7,9 @@ NUMBER_OF_CLASSES = 30
 
 class_lables = [str(i+1) for i in range(NUMBER_OF_CLASSES)]
 
+PCA_COMPONENTS = 500
+train_number = 3000
+test_number = 900
 
 data_folder = 'data/'
 
@@ -48,6 +51,10 @@ test_zero_crossing_path = test_acoustic_folder + zero_crossing_file_name
 rms_energy_file_name = 'rms_energy.csv'
 train_rms_energy_path = train_acoustic_folder + rms_energy_file_name
 test_rms_energy_path = test_acoustic_folder + rms_energy_file_name
+
+acoustic_combined_file_name = 'acoustic_combined.npy'
+train_acoustic_combined_path = train_acoustic_folder + acoustic_combined_file_name
+test_acoustic_combined_path = test_acoustic_folder + acoustic_combined_file_name
 
 filenames_file_name = 'filenames.csv'
 train_filenames_path = train_acoustic_folder + filenames_file_name
