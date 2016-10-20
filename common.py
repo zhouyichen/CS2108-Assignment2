@@ -3,8 +3,16 @@ import numpy as np
 
 AUDIO_LENGTH = 308700
 NUMBER_OF_FRAME = 603
+NUMBER_OF_CLASSES = 30
+
+class_lables = [str(i+1) for i in range(NUMBER_OF_CLASSES)]
+
 
 data_folder = 'data/'
+
+training_lables_path = data_folder + 'sorted_training_lable.npy'
+validation_lables_path = data_folder + 'sorted_validation_lable.npy'
+
 video_folder = data_folder + 'video/'
 train_video_folder = video_folder + 'training/'
 test_video_folder = video_folder + 'validation/'
