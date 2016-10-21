@@ -61,7 +61,7 @@ def extract_for_folder(input_audio_folder, output_folder):
 
 		feature_mfcc, feature_spect, feature_zerocrossing, feature_energy = getAcousticFeatures(audio_path)
 
-		mfcc_writer.writerow(feature_mfcc.flatten())
+		mfcc_writer.writerow(feature_mfcc.flatten('F'))
 		melspectrogram_writer.writerow(feature_spect.flatten())
 		zero_crossing_writer.writerow(feature_zerocrossing.flatten())
 		rms_energy_writer.writerow(feature_energy.flatten())
