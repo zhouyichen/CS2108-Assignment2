@@ -9,16 +9,30 @@ from common import *
 import cPickle as pickle
 import csv
 
-def extend_to_length_k(y, k):
-	r = k / y.size + 1
-	res = np.tile(y, r)
-	return res[:k]
+def getAcousticFeatures(y, sr, statistics=True):
+	# 4. Compute Melspectrogram features from the raw signal.
+	feature_spect = librosa.feature.melspectrogram(y=y, sr=sr, fmax=50000)
 
-def get_mfcc_features(feature_spect, statistics=True):
-	mfcc = librosa.feature.mfcc(S=librosa.logamplitude(feature_spect), n_mfcc=13)
+	# 5. Compute MFCC features from the Melspectrogram.
+	mfcc = librosa.feature.mfcc(S=librosa.logamplitude(feature_spect), n_mfcc=20)
 	mfcc_delta = librosa.feature.delta(mfcc)
 	mfcc_delta2 = librosa.feature.delta(mfcc, order=2)
-	feature_matrix = np.vstack((mfcc, mfcc_delta, mfcc_delta2)).T
+
+	# 6. Compute Zero-Crossing features from the raw signal.
+	feature_zerocrossing = librosa.feature.zero_crossing_rate(y=y)
+	z_delta = librosa.feature.delta(feature_zerocrossing)
+	z_delta2 = librosa.feature.delta(feature_zerocrossing, order=2)
+
+	# 7. Compute Root-Mean-Square (RMS) Energy for each frame.
+	feature_energy = librosa.feature.rmse(y=y)
+	e_delta = librosa.feature.delta(feature_energy)
+	e_delta2 = librosa.feature.delta(feature_energy, order=2)
+
+	feature_matrix = np.vstack((mfcc, mfcc_delta, mfcc_delta2,
+		feature_zerocrossing, z_delta, z_delta2,
+		feature_energy, e_delta, e_delta2)).T
+	
+	feature_matrix = feature_matrix[1:-1, :]
 	if statistics:
 		return {
 			'feat': feature_matrix,
@@ -32,21 +46,6 @@ def get_mfcc_features(feature_spect, statistics=True):
 		}
 	else:
 		return feature_matrix
-
-def getAcousticFeatures(y, sr):
-    # 4. Compute Melspectrogram features from the raw signal.
-	feature_spect = librosa.feature.melspectrogram(y=y, sr=sr, fmax=50000)
-
-    # 5. Compute MFCC features from the Melspectrogram.
-	feature_mfcc = get_mfcc_features(feature_spect)
-
-    # 6. Compute Zero-Crossing features from the raw signal.
-    feature_zerocrossing = librosa.feature.zero_crossing_rate(y=y)
-
-    # 7. Compute Root-Mean-Square (RMS) Energy for each frame.
-    feature_energy = librosa.feature.rmse(y=y)
-
-    return feature_mfcc, feature_spect, feature_zerocrossing, feature_energy
 
 def getAcousticFeaturesFromPath(audio_reading_path):
 	# 1. Load the audio clip;
@@ -62,17 +61,17 @@ def getAcousticFeaturesFromPath(audio_reading_path):
 	return getAcousticFeatures(y, sr)
 
 def extract_for_folder(input_audio_folder, output_folder):
-	mfcc_out_file = open(output_folder + mfcc_file_name, 'wb')
-	mfcc_writer = csv.writer(mfcc_out_file)
+	acoustic_out_file = open(train_acoustic_combined_path, 'wb')
+	# mfcc_writer = csv.writer(mfcc_out_file)
 
-	melspectrogram_out_file = open(output_folder + melspectrogram_file_name, 'w')
-	melspectrogram_writer = csv.writer(melspectrogram_out_file)
+	# melspectrogram_out_file = open(output_folder + melspectrogram_file_name, 'w')
+	# melspectrogram_writer = csv.writer(melspectrogram_out_file)
 
-	zero_crossing_out_file = open(output_folder + zero_crossing_file_name, 'w')
-	zero_crossing_writer = csv.writer(zero_crossing_out_file)
+	# zero_crossing_out_file = open(output_folder + zero_crossing_file_name, 'w')
+	# zero_crossing_writer = csv.writer(zero_crossing_out_file)
 
-	rms_energy_out_file = open(output_folder + rms_energy_file_name, 'w')
-	rms_energy_writer = csv.writer(rms_energy_out_file)
+	# rms_energy_out_file = open(output_folder + rms_energy_file_name, 'w')
+	# rms_energy_writer = csv.writer(rms_energy_out_file)
 
 	audio_ids = []
 	for audio_path in glob.glob(input_audio_folder + "/*.wav"):
@@ -81,16 +80,13 @@ def extract_for_folder(input_audio_folder, output_folder):
 		print(audio_id)
 		audio_ids.append(audio_id)
 
-		feature_mfcc, feature_spect, feature_zerocrossing, feature_energy = getAcousticFeaturesFromPath(audio_path)
+		features = getAcousticFeaturesFromPath(audio_path)
 
-		pickle.dump(feature_mfcc, mfcc_out_file)
-		melspectrogram_writer.writerow(feature_spect.flatten())
-		zero_crossing_writer.writerow(feature_zerocrossing.flatten())
-		rms_energy_writer.writerow(feature_energy.flatten())
+		pickle.dump(features, acoustic_out_file)
 
-	filenames_out_file = open(output_folder + filenames_file_name, 'w')
-	filenames_writer = csv.writer(filenames_out_file)
-	filenames_writer.writerow(audio_ids)
+	# filenames_out_file = open(output_folder + filenames_file_name, 'w')
+	# filenames_writer = csv.writer(filenames_out_file)
+	# filenames_writer.writerow(audio_ids)
 
 if __name__ == '__main__':
 	extract_for_folder(train_audio_folder, train_acoustic_folder)
