@@ -3,10 +3,10 @@
 # More details: http://librosa.github.io/librosa/tutorial.html#more-examples.
 
 from __future__ import print_function
-import moviepy.editor as mp
 import librosa
 import glob
 from common import *
+import cPickle as pickle
 import csv
 
 def extend_to_length_k(y, k):
@@ -14,22 +14,31 @@ def extend_to_length_k(y, k):
 	res = np.tile(y, r)
 	return res[:k]
 
-def getAcousticFeatures(audio_reading_path):
-    # 1. Load the audio clip;
-    y, sr = librosa.load(audio_reading_path)
-    y = extend_to_length_k(y, AUDIO_LENGTH)
+def get_mfcc_features(feature_spect, statistics=True):
+	mfcc = librosa.feature.mfcc(S=librosa.logamplitude(feature_spect), n_mfcc=13)
+	mfcc_delta = librosa.feature.delta(mfcc)
+	mfcc_delta2 = librosa.feature.delta(mfcc, order=2)
+	feature_matrix = np.vstack((mfcc, mfcc_delta, mfcc_delta2)).T
+	if statistics:
+		return {
+			'feat': feature_matrix,
+			'stat': {
+				'mean': np.mean(feature_matrix, axis=0),
+				'std': np.std(feature_matrix, axis=0),
+				'N': feature_matrix.shape[0],
+				'S1': np.sum(feature_matrix, axis=0),
+				'S2': np.sum(feature_matrix ** 2, axis=0),
+			}
+		}
+	else:
+		return feature_matrix
 
-    # 2. Separate harmonics and percussives into two waveforms.
-    # y_harmonic, y_percussive = librosa.effects.hpss(y)
-
-    # # 3. Beat track on the percussive signal.
-    # tempo, beat_frames = librosa.beat.beat_track(y=y_percussive, sr=sr)
-
+def getAcousticFeatures(y, sr):
     # 4. Compute Melspectrogram features from the raw signal.
-    feature_spect = librosa.feature.melspectrogram(y=y, sr=sr, fmax=80000)
+	feature_spect = librosa.feature.melspectrogram(y=y, sr=sr, fmax=50000)
 
     # 5. Compute MFCC features from the Melspectrogram.
-    feature_mfcc = librosa.feature.mfcc(S=librosa.logamplitude(feature_spect), n_mfcc=13)
+	feature_mfcc = get_mfcc_features(feature_spect)
 
     # 6. Compute Zero-Crossing features from the raw signal.
     feature_zerocrossing = librosa.feature.zero_crossing_rate(y=y)
@@ -39,8 +48,21 @@ def getAcousticFeatures(audio_reading_path):
 
     return feature_mfcc, feature_spect, feature_zerocrossing, feature_energy
 
+def getAcousticFeaturesFromPath(audio_reading_path):
+	# 1. Load the audio clip;
+	y, sr = librosa.load(audio_reading_path)
+	# y = extend_to_length_k(y, AUDIO_LENGTH)
+
+	# 2. Separate harmonics and percussives into two waveforms.
+	# y_harmonic, y_percussive = librosa.effects.hpss(y)
+
+	# # 3. Beat track on the percussive signal.
+	# tempo, beat_frames = librosa.beat.beat_track(y=y_percussive, sr=sr)
+
+	return getAcousticFeatures(y, sr)
+
 def extract_for_folder(input_audio_folder, output_folder):
-	mfcc_out_file = open(output_folder + mfcc_file_name, 'w')
+	mfcc_out_file = open(output_folder + mfcc_file_name, 'wb')
 	mfcc_writer = csv.writer(mfcc_out_file)
 
 	melspectrogram_out_file = open(output_folder + melspectrogram_file_name, 'w')
@@ -59,9 +81,9 @@ def extract_for_folder(input_audio_folder, output_folder):
 		print(audio_id)
 		audio_ids.append(audio_id)
 
-		feature_mfcc, feature_spect, feature_zerocrossing, feature_energy = getAcousticFeatures(audio_path)
+		feature_mfcc, feature_spect, feature_zerocrossing, feature_energy = getAcousticFeaturesFromPath(audio_path)
 
-		mfcc_writer.writerow(feature_mfcc.flatten('F'))
+		pickle.dump(feature_mfcc, mfcc_out_file)
 		melspectrogram_writer.writerow(feature_spect.flatten())
 		zero_crossing_writer.writerow(feature_zerocrossing.flatten())
 		rms_energy_writer.writerow(feature_energy.flatten())
