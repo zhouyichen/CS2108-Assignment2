@@ -2,62 +2,12 @@
 from common import *
 import moviepy.editor as mp
 import glob
+from searchers.visual_searcher import get_key_frames_from_video
 
 def getKeyFrames(vidcap, store_frame_path):
-    count = 0
-    lastHist = None
-    sumDiff = []
-    frames = []
-
-    while True:
-        success, frame = vidcap.read()
-        if not success:
-            break
-        frames.append(frame)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
-
-        if count >0:
-            diff = np.abs(hist - lastHist)
-            s = np.sum(diff)
-            sumDiff.append(s)
-        lastHist = hist
-        count += 1
-
-    if len(frames) == 0:
-        return
-
-    m = np.mean(sumDiff)
-    std = np.std(sumDiff)
-
-    candidates = []
-    candidates_value = []
-    for i in range(len(sumDiff)):
-        if sumDiff[i] > m + std*3:
-            candidates.append(i + 1)
-            candidates_value.append(sumDiff[i])
-
-    if len(candidates) > 20:
-        top10list = sorted(range(len(candidates_value)), key=lambda i: candidates_value[i])[-9:]
-        res = []
-        for i in top10list:
-            res.append(candidates[i])
-        candidates = sorted(res)
-
-    candidates = [0] + candidates
-
-    keyframes = []
-    lastframe = -2
-    for frame in candidates:
-        if not frame == lastframe + 1:
-            keyframes.append(frame)
-        lastframe = frame
-
-    count = 0
-    for frame in keyframes:
-        image = frames[frame]
+    keyframes = get_key_frames_from_video(vidcap)
+    for count, image in keyframes:
         cv2.imwrite(store_frame_path+"frame%d.jpg" % count, image)
-        count += 1
 
 def getAudioClip(video_reading_path, audio_storing_path):
     clip = mp.VideoFileClip(video_reading_path)
@@ -70,7 +20,9 @@ def extract_for_folder(input_video_folder, output_frame_folder, output_audio_fol
     for video_path in glob.glob(input_video_folder + "/*.mp4"):
         
         video_id = video_path[video_path.rfind("/") + 1:-4]
-        # if int(video_id) < 1001088152326610944:
+        # if int(video_id) != 1001088152326610944:
+        #     continue
+        # if int(video_id) != 1001949402207817728:
         #     continue
         print video_id
         vidcap = cv2.VideoCapture(video_path)

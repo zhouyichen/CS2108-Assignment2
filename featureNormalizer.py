@@ -127,14 +127,14 @@ class FeatureNormalizer(object):
 		return (feature_matrix - self.mean) / self.std
 
 if __name__ == '__main__':
-	pkl_file = open(train_mfcc_path, 'rb')
+	pkl_file = open(train_acoustic_combined_path, 'rb')
 	normalizer = FeatureNormalizer()
 	for i in range(train_number):
 		print i
 		feature_data = pickle.load(pkl_file)['stat']
 		normalizer.accumulate(feature_data)
 	normalizer.finalize()
-	normalizer_file = open(train_mfcc_normalizer_path, 'wb')
+	normalizer_file = open(train_acoustic_normalizer_path, 'wb')
 	pickle.dump(normalizer, normalizer_file)
 
 
