@@ -2,12 +2,7 @@
 from common import *
 import moviepy.editor as mp
 import glob
-from searchers.visual_searcher import get_key_frames_from_video
-
-def getKeyFrames(vidcap, store_frame_path):
-    keyframes = get_key_frames_from_video(vidcap)
-    for count, image in keyframes:
-        cv2.imwrite(store_frame_path+"frame%d.jpg" % count, image)
+from searchers.visual_searcher import getKeyFrames
 
 def getAudioClip(video_reading_path, audio_storing_path):
     clip = mp.VideoFileClip(video_reading_path)
