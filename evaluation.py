@@ -14,6 +14,8 @@ def evaluation_for_acoustic(number_of_components=64):
 	acoustic_pkl_file = open(test_acoustic_combined_path, 'rb')
 	correct = 0
 	print 'loading data'
+	print 'Top-5 Accuracy Rate:'
+	correct_matrix = [0 for i in range(30)]
 	for i in range(test_number):
 		feature_data = pickle.load(acoustic_pkl_file)['feat']
 		feature_data = normalizer.normalize(feature_data)
@@ -21,8 +23,10 @@ def evaluation_for_acoustic(number_of_components=64):
 		result = do_classification_gmm(feature_data, models)
 		if lable in result:
 			correct += 1
+			correct_matrix[lable] = correct_matrix[lable] + 1
 
 	print number_of_components, correct
+	print correct_matrix
 
 def evaluation_for_visual(number_of_components=18):
 	# 18
@@ -34,14 +38,19 @@ def evaluation_for_visual(number_of_components=18):
 	correct = 0
 
 	print 'evaluation'
+	print 'Top-5 Accuracy Rate:'
+	correct_matrix = [0 for i in range(30)]
+	lable_count = [0 for i in range(30)]
 	for i in range(test_number):
 		feature_data = X_test[i].reshape(-1, 1008)
 		lable = int(y_test[i]) - 1
 		result = do_classification_gmm(feature_data, models)
 		if lable in result:
 			correct += 1
+			correct_matrix[lable] = correct_matrix[lable] + 1
 
 	print number_of_components, correct
+	print correct_matrix
 
 if __name__ == '__main__':
 	number_of_components = sys.argv[1]
