@@ -83,21 +83,27 @@ def extract_testing_data_for_evaluation():
 		lables_table[i[0]] = i[1]
 
 	print('find lable')
-	y_test = np.zeros(number_of_samples)
+	y_test = np.zeros(test_number)
 	previous_id = 0
 	X_combined = []
 	features = None
+	counter = 0
+	image_id = None
 	for i in range(number_of_samples):
 		print(i)
 		image_id = int(X_test_raw[i, 0][:19])
-		y_test[i] = lables_table[image_id]
+		
 		if image_id == previous_id:
 			features = np.vstack((features, X_test_data[i]))
 		else:
 			if i!=0:
+				y_test[counter] = lables_table[image_id]
 				X_combined.append(features)
+				counter += 1
 			features = X_test_data[i]
 			previous_id = image_id
+	print(counter)
+	y_test[counter] = lables_table[image_id]
 	X_combined.append(features)
 	print(len(X_combined))
 	print('saving')
@@ -135,7 +141,7 @@ def train():
 	res.sort(key = lambda i: -i[2])
 	print(res)
 if __name__ == '__main__':
-	apply_lable_to_images()
+	# apply_lable_to_images()
 	extract_testing_data_for_evaluation()
 
 
