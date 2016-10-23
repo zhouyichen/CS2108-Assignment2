@@ -45,16 +45,16 @@ class UI_class:
 		self.videoname = self.filename.strip().split("/")[-1].replace(".mp4","")
 
 		vidcap = cv2.VideoCapture(self.filename)
-		directory = self.frame_storing_path + self.videoname + '/'
-		if not os.path.exists(directory):
-			os.makedirs(directory)
-		self.visual_seacher.extract_frames(vidcap, directory)
+		self.query_frames_folder = self.frame_storing_path + self.videoname + '/'
+		if not os.path.exists(self.query_frames_folder):
+			os.makedirs(self.query_frames_folder)
+		self.visual_seacher.extract_frames(vidcap, self.query_frames_folder)
 
-		allframes = os.listdir(directory)
+		allframes = os.listdir(self.query_frames_folder)
 
 		self.frames = []
 		for frame in allframes:
-			self.frames.append(directory + frame)
+			self.frames.append(self.query_frames_folder + frame)
 
 		COLUMNS = len(self.frames)
 		self.columns = COLUMNS
@@ -87,9 +87,9 @@ class UI_class:
 				continue
 
 		clip = mp.VideoFileClip(self.filename)
-		audio_out_path = self.audio_storing_path + self.videoname + '.wav'
+		self.query_audio_path = self.audio_storing_path + self.videoname + '.wav'
 		try:
-			clip.audio.write_audiofile(audio_out_path)
+			clip.audio.write_audiofile(self.query_audio_path)
 		except Exception, e:
 			print e
 
@@ -107,13 +107,11 @@ class UI_class:
 		self.result_img_frame = Frame(self.master)
 		self.result_img_frame.pack()
 
-		# Please note that, you need to write your own classifier to estimate the venue category to show blow.
-		if self.videoname == '1':
-		   venue_text = "Home"
-		elif self.videoname == '2':
-			venue_text = 'Bridge'
-		elif self.videoname == '4':
-			venue_text = 'Park'
+		acoustic_results = self.acoustic_seacher.search(self.query_audio_path)
+		visual_results = self.visual_seacher.search(self.query_frames_folder)
+		print acoustic_results
+		print visual_results
+		venue_tags = []
 
 		venue_img = Image.open("venue_background.jpg")
 		draw = ImageDraw.Draw(venue_img)

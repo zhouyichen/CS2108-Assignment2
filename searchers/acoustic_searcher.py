@@ -1,7 +1,6 @@
 # import the necessary packages
-
-from normalizer import *
 import librosa
+import numpy as np
 
 def sort_and_get_top_five(array):
 	return array.argsort()[-5:][::-1]
@@ -69,15 +68,13 @@ def getAcousticFeaturesFromPath(audio_reading_path, statistics=True):
 
 	return getAcousticFeatures(y, sr, statistics)
 
+			  
 def return_all_probabilities(feature_data, model):
-	logls = np.empty(len(model))
-	logls.fill(-np.inf)
-
+	logls = np.zeros(30)
 	for label_id, label in enumerate(model):
-		logls[label_id] = np.exp(np.sum(model[label].score(feature_data)))
-
-	# classification_result_ids = sort_and_get_top_five(logls)
-	return logls / max(logls)
+		logls[label_id] = np.sum(model[label].score(feature_data))
+	logls = logls - np.max(logls)
+	return logls / np.std(logls)
 
 
 class AcousticSeacher(object):

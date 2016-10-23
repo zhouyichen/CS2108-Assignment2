@@ -130,7 +130,7 @@ class DeepLearningSearcher(object):
 			self.sess = sess
 
 
-	def run_inference_on_images(input_path):
+	def run_inference_on_images(self, input_path):
 		# Creates graph from saved GraphDef.
 		create_graph()
 		feature_list = None
@@ -149,10 +149,6 @@ class DeepLearningSearcher(object):
 			# use glob to grab the image paths and loop over them
 			for imagePath in glob.glob(input_path + "/*.jpg"):
 
-				# extract the image ID (i.e. the unique filename) from the image
-				# path and load the image itself
-				imageID = imagePath[imagePath.rfind("/") + 1:-4]
-				print(imageID)
 
 				# describe the image
 				image_data = tf.gfile.FastGFile(imagePath, 'rb').read()
@@ -160,23 +156,18 @@ class DeepLearningSearcher(object):
 									 {'DecodeJpeg/contents:0': image_data})
 				predictions = np.squeeze(predictions)
 
-				if not feature_list:
+				if feature_list is None:
 					feature_list = predictions
 				else:
 					feature_list = np.vstack((feature_list, predictions))
 		return feature_list
 			  
-
 def return_all_probabilities(feature_data, model):
-	logls = np.empty(len(model))
-	logls.fill(-np.inf)
-
+	logls = np.zeros(30)
 	for label_id, label in enumerate(model):
-		logls[label_id] = np.exp(np.sum(model[label].score(feature_data)))
-
-	# classification_result_ids = sort_and_get_top_five(logls)
-	return logls / max(logls)
-
+		logls[label_id] = np.sum(model[label].score(feature_data))
+	logls = logls - np.max(logls)
+	return logls / np.std(logls)
 
 class VisualSeacher(object):
 	def __init__(self, model):
@@ -184,10 +175,12 @@ class VisualSeacher(object):
 		self.model = model
 		self.dp_searcher = DeepLearningSearcher()
 
-	def search(self, vidcap, folder_name):
+	def extract_frames(self, vidcap, folder_name):
 		getKeyFrames(vidcap, folder_name)
+
+	def search(self, folder_name):
+		print(folder_name)
 		features = self.dp_searcher.run_inference_on_images(folder_name).reshape(-1, 1008)
 		result = return_all_probabilities(features, self.model)
-		print(result)
 		return result
 
