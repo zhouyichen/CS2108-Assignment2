@@ -1004,7 +1004,7 @@ class Sent2Vec(utils.SaveLoad):
 
         return len([word for word in sentence if word is not None])
 
-    def save_sent2vec_format(self, fname, ids):
+    def save_sent2vec_format(self, fname):
         """
         Store the input-hidden weight matrix in the same format used by the original
         C word2vec-tool, for compatibility.
@@ -1013,11 +1013,11 @@ class Sent2Vec(utils.SaveLoad):
         logger.info("storing %sx%s projection weights into %s" % (self.sents_len, self.layer1_size, fname))
         assert (self.sents_len, self.layer1_size) == self.sents.shape
         with utils.smart_open(fname, 'wb') as fout:
-            fout.write(utils.to_utf8("%s %s\n" % self.sents.shape))
+            # fout.write(utils.to_utf8("%s %s\n" % self.sents.shape))
             # store in sorted order: most frequent words at the top
             for sent_no in xrange(self.sents_len):
                 row = self.sents[sent_no]
-                fout.write(utils.to_utf8("%s %s\n" % (ids[sent_no], ' '.join("%f" % val for val in row))))
+                fout.write(utils.to_utf8("%s\n" % (' '.join("%f" % val for val in row))))
 
     def similarity(self, sent1, sent2):
         """

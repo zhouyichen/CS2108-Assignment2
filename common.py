@@ -68,6 +68,8 @@ test_filenames_path = test_acoustic_folder + filenames_file_name
 textual_folder = data_folder + 'textual/'
 textual_train_file_name = textual_folder + 'vine_desc_training_'
 textual_test_file_name = textual_folder + 'vine_desc_validation_'
+textual_train_ids = textual_folder + 'train_ids.npy'
+textual_test_ids = textual_folder + 'test_ids.npy'
 
 dp_train_raw_data = train_visual_folder + 'dp_raw.csv'
 vc_train_raw_data = train_visual_folder + 'vc_raw.csv'
