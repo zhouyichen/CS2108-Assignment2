@@ -33,7 +33,7 @@ test_audio_folder = audio_folder + 'validation/'
 acoustic_folder = data_folder + 'acoustic/'
 train_acoustic_folder = acoustic_folder + 'training/'
 test_acoustic_folder = acoustic_folder + 'validation/'
-train_acoustic_normalizer_path = train_acoustic_folder + 'acoustic_normalizer.pkl'
+train_acoustic_normalizer_path = model_folder + 'acoustic_normalizer.pkl'
 acoustic_gmm_models = '_acoustic_gmm.pkl'
 
 visual_folder = data_folder + 'visual/'

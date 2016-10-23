@@ -24,7 +24,7 @@ class UI_class:
 		topframe = Frame(self.master)
 		topframe.pack()
 		
-		self.venues = np.loadtxt('data/venue-name.txt', dtype=str, delimiter=',')
+		self.venues = np.loadtxt('venue-name.txt', dtype=str, delimiter=',')
 		acoustic_model = load_data(model_folder+str(64)+acoustic_gmm_models)
 		normalizer = load_data(train_acoustic_normalizer_path)
 		self.acoustic_seacher = AcousticSeacher(acoustic_model, normalizer)

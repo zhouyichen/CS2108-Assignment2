@@ -1,0 +1,30 @@
+City
+Theme Park
+Neighborhood
+Other Outdoors
+Park
+Beach
+Music Venue
+Airport
+University
+Baseball
+Home
+Football
+Stadium
+Mall
+Basketball
+Art Museum
+Concert Hall
+Nightclub
+Zoo
+Entertainment
+Travel
+Plaza / Square
+Hockey
+Hotel
+Rock Club
+Landmark
+Soccer
+Historic Site
+Resort
+Other-Buildings
