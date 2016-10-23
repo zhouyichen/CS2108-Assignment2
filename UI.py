@@ -5,6 +5,7 @@ root = Tk()
 import tkFileDialog
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from common import *
+import tkMessageBox
 from featureNormalizer import FeatureNormalizer
 from searchers.acoustic_searcher import AcousticSeacher
 from searchers.visual_searcher import VisualSeacher
@@ -85,12 +86,16 @@ class UI_class:
 
 
 	def show_venue_category(self):
+		if not hasattr(self, 'filename'):
+			tkMessageBox.showinfo("Error", "Please choose a video")
+			return  
+
+		if hasattr(self, 'result_img_frame'):
+			self.result_img_frame.pack_forget()
 
 		self.result_img_frame = Frame(self.master)
 		self.result_img_frame.pack()
-		if self.columns == 0:
-			print("Please extract the key frames for the selected video first!!!")
-		else:
+
 			# Please note that, you need to write your own classifier to estimate the venue category to show blow.
 			if self.videoname == '1':
 			   venue_text = "Home"
