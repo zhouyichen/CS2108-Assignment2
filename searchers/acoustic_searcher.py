@@ -1,9 +1,6 @@
 # import the necessary packages
 
-from __future__ import print_function
-from sklearn.decomposition import PCA
-from sklearn.svm import SVC
-import numpy as np
+from normalizer import *
 import librosa
 
 def sort_and_get_top_five(array):
@@ -83,7 +80,7 @@ def return_all_probabilities(feature_data, model):
 	return logls / max(logls)
 
 
-class AcousticSeacher:
+class AcousticSeacher(object):
 	def __init__(self, model, normalizer):
 		# store our index path
 		self.model = model
@@ -94,3 +91,5 @@ class AcousticSeacher:
 		features = self.normalizer.normalize(features)
 		result = return_all_probabilities(features, self.model)
 		return result
+
+
