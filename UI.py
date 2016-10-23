@@ -33,13 +33,28 @@ class UI_class:
 		self.visual_seacher = VisualSeacher(visual_model)
 
 		#Buttons
-		Label(topframe).grid(row=0, columnspan=2)
+		Label(topframe).grid(row=0, columnspan=4)
 		self.bbutton= Button(topframe, text=" Choose an video ", command=self.browse_query_img)
-		self.bbutton.grid(row=1, column=1)
+		self.bbutton.grid(row=1, column=2)
 		
 		self.cbutton = Button(topframe, text=" Estimate its venue ", command=self.show_venue_category)
-		self.cbutton.grid(row=1, column=2)
-		Label(topframe).grid(row=3, columnspan=4)
+		self.cbutton.grid(row=1, column=3)
+
+		self.a_label = Label(topframe, text="Weight for acoustic features:")
+		self.a_label.grid(row=2, column=1)
+		self.a_weight_entry = Entry(topframe)
+		self.a_weight_entry.delete(0, END)
+		self.a_weight_entry.insert(0, "10")
+		self.a_weight_entry.grid(row=2, column=2)
+
+		self.v_label = Label(topframe, text="Weight for visual feature:")
+		self.v_label.grid(row=2, column=3)
+		self.v_weight_entry = Entry(topframe)
+		self.v_weight_entry.delete(0, END)
+		self.v_weight_entry.insert(0, "1")
+		self.v_weight_entry.grid(row=2, column=4)
+
+		Label(topframe).grid(row=4, columnspan=4)
 
 		self.master.mainloop()
 
@@ -115,8 +130,8 @@ class UI_class:
 		acoustic_results = self.acoustic_seacher.search(self.query_audio_path)
 		visual_results = self.visual_seacher.search(self.query_frames_folder)
 
-		acoustic_weight = 10
-		visual_weight = 1
+		acoustic_weight = int(self.a_weight_entry.get())
+		visual_weight = int(self.v_weight_entry.get())
 
 		top_five = combine_results(acoustic_results, visual_results, 
 			acoustic_weight=acoustic_weight, visual_weight=visual_weight)
