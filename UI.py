@@ -130,8 +130,8 @@ class UI_class:
 		acoustic_results = self.acoustic_seacher.search(self.query_audio_path)
 		visual_results = self.visual_seacher.search(self.query_frames_folder)
 
-		acoustic_weight = int(self.a_weight_entry.get())
-		visual_weight = int(self.v_weight_entry.get())
+		acoustic_weight = max(float(self.a_weight_entry.get()), 0)
+		visual_weight = max(float(self.v_weight_entry.get()), 0)
 
 		top_five = combine_results(acoustic_results, visual_results, 
 			acoustic_weight=acoustic_weight, visual_weight=visual_weight)
